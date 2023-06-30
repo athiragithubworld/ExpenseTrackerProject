@@ -1,27 +1,52 @@
-import React from "react";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
+import AuthContext from "../../store/AuthContext";
+import classes from "./Header.module.css";
 
 const Header = () => {
+  const authcntx = useContext(AuthContext);
+  const isLoggedIn = authcntx.isLoggedIn;
+
+  const LogoutHandler = () => {
+    authcntx.logout();
+  };
+
   return (
-    <>
-      <nav
-        className="navbar bg-body-tertiary"
-        // style={{ backgroundColor: "#2B36CE" }} // 05096D--825AEA -- 6258ED-- 631E73
-      >
-        <div className="container-fluid">
+    <nav
+      className="navbar bg-body-tertiary"
+      style={{ backgroundColor: "black" }}
+    >
+      <div className="container-fluid">
+        <div className="navbar-brand mb-0 h1">
           <span
-            className="navbar-brand mb-0 h1"
             style={{
-              color: "White",
+              color: "white",
               fontSize: "50px",
-              fontFamily: "Font1, sans-serif",
+              fontFamily: "Arila",
               fontWeight: "bold",
+              fontStyle: "oblique",
+              marginLeft: 0,
+              textAlign: "left",
             }}
           >
-            Expense Tracker
+            {!isLoggedIn ? "Expense Tracker" : "Welcome to Expense Tracker"}
           </span>
         </div>
-      </nav>
-    </>
+        <ul>
+          {/* {!isLoggedIn && (
+            <li>
+              <Link to="/auth">Login</Link>
+            </li>
+          )} */}
+
+          {isLoggedIn && (
+            <li>
+              <button onClick={LogoutHandler}>Logout</button>
+            </li>
+          )}
+        </ul>
+      </div>
+    </nav>
   );
 };
 
