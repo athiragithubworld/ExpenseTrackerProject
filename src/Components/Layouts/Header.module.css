@@ -1,7 +1,18 @@
-.span {
+.headerspan {
   color: white;
-  font-size: 500px;
+  /* font-size: 50px;
   font-family: Arial;
   font-weight: bold;
   font-style: oblique;
+  margin-left: 0px;
+  text-align: left; */
+}
+
+.headerlabel {
+  /* margin-top: 15px; */
+  color: rgb(211, 98, 18);
+  /* background-color: rgb(77, 170, 145);
+  border-radius: 20px;
+  padding: 5.5px;
+  gap: 10px; */
 }
