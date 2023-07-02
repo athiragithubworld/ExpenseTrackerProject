@@ -1,7 +1,7 @@
 import React, { useState, useRef, useContext } from "react";
 import "./LoginPage.css";
 import AuthContext from "../../store/AuthContext";
-import Header from "../Layouts/Header";
+// import Header from "../Layouts/Header";
 
 const LoginPage = () => {
   const authcntx = useContext(AuthContext);
