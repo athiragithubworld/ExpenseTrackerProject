@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AuthContext from "./AuthContext";
 
 const AuthProvider = (props) => {
-  const intialToken = localStorage.getItem("emailobj");
-
-  const [token, setToken] = useState(intialToken);
+  let Loginstring = localStorage.getItem("emailobj");
+  const [token, setToken] = useState(Loginstring);
 
   const [email, setEmail] = useState("");
+
+  let logintoken = "";
+
+  useEffect(() => {
+    const Loginobj = JSON.parse(Loginstring);
+
+    if (Loginobj !== null) {
+      logintoken = Loginobj.token;
+      setToken(logintoken);
+    }
+  }, [Loginstring]);
 
   const userLoggedIn = !!token;
 
