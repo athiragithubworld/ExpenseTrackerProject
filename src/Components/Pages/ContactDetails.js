@@ -1,12 +1,41 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef, useContext, useEffect } from "react";
 import AuthContext from "../../store/AuthContext";
 import "./ContactDetails.css";
+import axios from "axios";
 
 const ContactDetails = (props) => {
   const authcntx = useContext(AuthContext);
 
   const inputName = useRef("");
   const inputUrl = useRef("");
+
+  useEffect(() => {
+    axios
+      .post(
+        "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyCxXXlq-KNU4vnkfR5NMnPqgwRPh5OF-PU",
+        {
+          // method: "POST",
+          // body: JSON.stringify({
+          idToken: authcntx.token,
+          // }),
+          // headers: {
+          //   "Content-Type": "application/json",
+          // },
+        }
+      )
+      .then((response) => {
+        // console.log("getresponse1", response.data.users);
+        const loginUser = response.data.users;
+        const userName = loginUser[0].displayName;
+        const userUrl = loginUser[0].photoUrl;
+
+        inputName.current.value = userName;
+        inputUrl.current.value = userUrl;
+      })
+      .catch((error) => {
+        console.log("err", error);
+      });
+  }, [authcntx.token]);
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -19,30 +48,33 @@ const ContactDetails = (props) => {
     // // console.log("name", enteredName);
     // // console.log("url", enteredUrl);
 
-    fetch(
-      "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyCxXXlq-KNU4vnkfR5NMnPqgwRPh5OF-PU",
-      {
-        method: "POST",
-        body: JSON.stringify({
+    axios
+      .post(
+        "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyCxXXlq-KNU4vnkfR5NMnPqgwRPh5OF-PU",
+        {
+          // method: "POST",
+          // body: JSON.stringify(
+          // {
           idToken: authcntx.token,
           displayName: enteredName,
           photoUrl: enteredUrl,
           returnSecureToken: true,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    )
+          // }
+
+          // headers: {
+          //   "Content-Type": "application/json",
+          // },
+        }
+      )
       .then((response) => {
-        console.log(response);
+        console.log("profilesubmit", response);
       })
       .catch((error) => {
         console.log("err", error);
       });
 
-    inputName.current.value = "";
-    inputUrl.current.value = "";
+    // inputName.current.value = "";
+    // inputUrl.current.value = "";
   };
 
   return (
