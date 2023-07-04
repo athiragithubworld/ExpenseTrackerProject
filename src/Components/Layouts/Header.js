@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import AuthContext from "../../store/AuthContext";
+import axios from "axios";
 // import classes from "./Header.module.css";
 
 const Header = (props) => {
@@ -9,6 +10,37 @@ const Header = (props) => {
 
   const LogoutHandler = () => {
     authcntx.logout();
+  };
+
+  const verifyEmailHandler = () => {
+    // console.log("id", authcntx.token);
+    axios
+      .post(
+        "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCxXXlq-KNU4vnkfR5NMnPqgwRPh5OF-PU",
+        {
+          requestType: "VERIFY_EMAIL",
+          idToken: authcntx.token,
+        }
+      )
+      .then((response) => {
+        console.log(response);
+        // if (response.ok) {
+        //   return response.json();
+        // } else {
+        //   return response.json().then((data) => {
+        //     let errormessage = "Authentication Failed";
+        //     if (data && data.error && data.error.message) {
+        //       errormessage = data.error.message;
+        //     }
+        //     alert(errormessage);
+        //   });
+        // }
+        alert("Email Verified Sucessfully");
+      })
+      .catch((error) => {
+        console.log("Error", error);
+        alert(error.message);
+      });
   };
 
   return (
@@ -34,34 +66,49 @@ const Header = (props) => {
         </div>
         <ul style={{ listStyle: "none" }}>
           {isLoggedIn && (
-            <li>
-              <label
-                // className={classes.label}
-                style={{
-                  marginTop: "15px",
-                  color: "white",
-                  backgroundColor: "rgb(76, 18, 211)",
-                  borderRadius: "20px",
-                  padding: "5.5px",
-                  // gap: "10px",
-                }}
-              >
-                Your Profile is Incomplete.
-                <Link to="/contact" onClick={props.onClicks}>
-                  Complete Now
-                </Link>
-              </label>
-              <span style={{ marginLeft: "10px" }}>
-                <button
-                  style={{ borderRadius: "20px" }}
-                  type="button"
-                  className="btn btn-outline-danger"
-                  onClick={LogoutHandler}
+            <div>
+              <li>
+                <label
+                  // className={classes.label}
+                  style={{
+                    marginTop: "15px",
+                    color: "white",
+                    backgroundColor: "rgb(76, 18, 211)",
+                    borderRadius: "20px",
+                    padding: "5.5px",
+                    // gap: "10px",
+                  }}
                 >
-                  Logout
-                </button>
-              </span>
-            </li>
+                  Your Profile is Incomplete.
+                  <Link to="/contact" onClick={props.onClicks}>
+                    Complete Now
+                  </Link>
+                </label>
+              </li>
+
+              <li>
+                <span>
+                  <button
+                    type="button"
+                    class="btn btn-outline-warning"
+                    style={{ borderRadius: "20px" }}
+                    onClick={verifyEmailHandler}
+                  >
+                    Verify Email
+                  </button>
+                </span>
+                <span style={{ marginLeft: "120px" }}>
+                  <button
+                    style={{ borderRadius: "20px" }}
+                    type="button"
+                    className="btn btn-outline-danger"
+                    onClick={LogoutHandler}
+                  >
+                    Logout
+                  </button>
+                </span>
+              </li>
+            </div>
           )}
         </ul>
       </div>
