@@ -14,13 +14,7 @@ const ContactDetails = (props) => {
       .post(
         "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyCxXXlq-KNU4vnkfR5NMnPqgwRPh5OF-PU",
         {
-          // method: "POST",
-          // body: JSON.stringify({
           idToken: authcntx.token,
-          // }),
-          // headers: {
-          //   "Content-Type": "application/json",
-          // },
         }
       )
       .then((response) => {
@@ -42,28 +36,14 @@ const ContactDetails = (props) => {
     const enteredName = inputName.current.value;
     const enteredUrl = inputUrl.current.value;
 
-    // const token = authcntx.token.toString();
-
-    // console.log("token2", token.toString());
-    // // console.log("name", enteredName);
-    // // console.log("url", enteredUrl);
-
     axios
       .post(
         "https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyCxXXlq-KNU4vnkfR5NMnPqgwRPh5OF-PU",
         {
-          // method: "POST",
-          // body: JSON.stringify(
-          // {
           idToken: authcntx.token,
           displayName: enteredName,
           photoUrl: enteredUrl,
           returnSecureToken: true,
-          // }
-
-          // headers: {
-          //   "Content-Type": "application/json",
-          // },
         }
       )
       .then((response) => {
