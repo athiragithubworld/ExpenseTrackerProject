@@ -24,22 +24,15 @@ const Header = (props) => {
       )
       .then((response) => {
         console.log(response);
-        // if (response.ok) {
-        //   return response.json();
-        // } else {
-        //   return response.json().then((data) => {
-        //     let errormessage = "Authentication Failed";
-        //     if (data && data.error && data.error.message) {
-        //       errormessage = data.error.message;
-        //     }
-        //     alert(errormessage);
-        //   });
-        // }
+
         alert("Email Verified Sucessfully");
       })
       .catch((error) => {
         console.log("Error", error);
-        alert(error.message);
+        if (error.message) {
+          let responsedata = error.response.data;
+          alert(responsedata.error.message);
+        }
       });
   };
 
