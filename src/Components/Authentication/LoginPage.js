@@ -1,12 +1,14 @@
 import React, { useState, useRef, useContext } from "react";
 import "./LoginPage.css";
 import AuthContext from "../../store/AuthContext";
+import axios from "axios";
 // import Header from "../Layouts/Header";
 
 const LoginPage = () => {
   const authcntx = useContext(AuthContext);
 
   const [isLogin, setIsLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const inputEmail = useRef();
   const inputPassword = useRef();
@@ -84,6 +86,30 @@ const LoginPage = () => {
     inputPassword.current.value = "";
   };
 
+  const resetPasswordHandler = () => {
+    if (inputEmail.current.value !== "") {
+      setLoading(true);
+      axios
+        .post(
+          "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCxXXlq-KNU4vnkfR5NMnPqgwRPh5OF-PU",
+          {
+            requestType: "PASSWORD_RESET",
+            email: inputEmail.current.value,
+          }
+        )
+        .then((response) => {
+          setLoading(false);
+          console.log(response);
+          alert("Open your Email and reset password");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      alert("Please Enter Valid Email");
+    }
+  };
+
   return (
     <div className="container">
       {/* <input id="register_toggle" type="checkbox" /> */}
@@ -114,7 +140,11 @@ const LoginPage = () => {
               <label className="label"> Confirm Password</label>
             </div>
           )}
-
+          {isLogin && (
+            <span className="bottom_text" onClick={resetPasswordHandler}>
+              {!loading ? "Forget Password ?" : "Loading..."}
+            </span>
+          )}
           <button>{isLogin ? "Login" : "Sign Up"}</button>
 
           <span className="bottom_text" onClick={switchAuthModeHandler}>
