@@ -46,7 +46,7 @@ const Header = (props) => {
           <span
             style={{
               color: "white",
-              fontSize: "50px",
+              fontSize: "30px",
               fontFamily: "Arila",
               fontWeight: "bold",
               fontStyle: "oblique",
