@@ -59,6 +59,13 @@ const Header = (props) => {
         </div>
         <ul style={{ listStyle: "none" }}>
           {isLoggedIn && (
+            <li>
+              <Link to="/dailyexpense">Daily Expense</Link>
+            </li>
+          )}
+        </ul>
+        <ul style={{ listStyle: "none" }}>
+          {isLoggedIn && (
             <div>
               <li>
                 <label
