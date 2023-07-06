@@ -4,6 +4,7 @@ import Header from "./Components/Layouts/Header";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import AuthContext from "./store/AuthContext";
 import ContactDetails from "./Components/Pages/ContactDetails";
+import DailyExpense from "./Components/Pages/DailyExpense";
 
 function App() {
   const authcntx = useContext(AuthContext);
@@ -40,6 +41,9 @@ function App() {
             path="/contact"
             element={<ContactDetails onClose={closeCart} />}
           />
+        )}
+        {authcntx.isLoggedIn && (
+          <Route path="/dailyexpense" element={<DailyExpense />} />
         )}
       </Routes>
     </div>
