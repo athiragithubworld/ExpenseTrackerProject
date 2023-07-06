@@ -1,0 +1,25 @@
+.expenseform {
+  background-color: #353434;
+  padding: 20px;
+  border-radius: 10px;
+  width: 800px;
+  margin: 3rem auto;
+}
+
+.expenselabel {
+  color: white;
+}
+
+.h1-expense {
+  color: white;
+  text-align: center;
+}
+
+.thead-exp {
+  background-color: black;
+  color: white;
+}
+
+.row-exp {
+  color: white;
+}
