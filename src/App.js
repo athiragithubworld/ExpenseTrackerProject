@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import LoginPage from "./Components/Authentication/LoginPage";
 import Header from "./Components/Layouts/Header";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import AuthContext from "./store/AuthContext";
 import ContactDetails from "./Components/Pages/ContactDetails";
 import DailyExpense from "./Components/Pages/DailyExpense";
