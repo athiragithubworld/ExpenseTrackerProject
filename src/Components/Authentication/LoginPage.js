@@ -1,11 +1,15 @@
 import React, { useState, useRef, useContext } from "react";
 import "./LoginPage.css";
-import AuthContext from "../../store/AuthContext";
+import AuthContext from "../../store/context/AuthContext";
 import axios from "axios";
 // import Header from "../Layouts/Header";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../store/AuthSlice";
 
 const LoginPage = () => {
-  const authcntx = useContext(AuthContext);
+  const dispatch = useDispatch();
+
+  // const authcntx = useContext(AuthContext);
 
   const [isLogin, setIsLogin] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,7 +56,6 @@ const LoginPage = () => {
       })
         .then((response) => {
           if (response.ok) {
-            // console.log("User has successfully signed up");
             return response.json();
           } else {
             return response.json().then((data) => {
@@ -69,7 +72,12 @@ const LoginPage = () => {
           console.log("loginid", data.idToken);
 
           const email = data.email.replace(/[@.]/g, "");
-          authcntx.login(data.idToken, email);
+
+          // authcontext api
+          // authcntx.login(data.idToken, email);
+
+          // dispatch the value
+          dispatch(authActions.login({ token: data.idToken, email: email }));
 
           // console.log("email", email);
           // cartcntx.addProduct({ email: email });
