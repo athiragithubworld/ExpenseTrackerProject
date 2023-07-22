@@ -27,3 +27,15 @@
 .btn-exp {
   font-size: 1px;
 }
+
+.totalExpenses {
+  color: rgb(240, 20, 214);
+  font-size: 30px;
+  font-weight: bold;
+}
+
+.btn-premium {
+  width: 50px;
+  font-size: 10px; /* You can adjust the font size */
+  /* padding: 6px 12px; You can adjust the padding to control the overall size */
+}

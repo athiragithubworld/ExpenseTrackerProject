@@ -1,28 +1,39 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "./DailyExpense.css";
-import CartContext from "../../store/CartContext";
+import CartContext from "../../store/context/CartContext";
+import { useDispatch, useSelector } from "react-redux";
+// import { cartActions } from "../../store/CartSlice";
+import { expenseActions } from "../../store/ExpenseSlice";
+import axios from "axios";
 
 const DailyExpense = () => {
-  const cartcnxt = useContext(CartContext);
+  // const cartcnxt = useContext(CartContext);
+  const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth);
+
   // console.log("cartcnxt.expenseList", cartcnxt.expenseList);
-  const [expenseList, setExpenseList] = useState([cartcnxt.expenseList]);
+  // const [expenseList, setExpenseList] = useState([cartcnxt.expenseList]);
+  const [activePremium, setActivePremium] = useState(false);
   const [objId, setObjId] = useState("");
 
-  const inputExpense = useRef("");
-  const inputDate = useRef("");
-  const inputDescription = useRef("");
-  const inputCategory = useRef("");
+  const expense = useSelector((state) => state.expenses);
 
-  useEffect(() => {
-    setExpenseList(cartcnxt.expenseList);
-  }, [cartcnxt.expenseList]);
+  const inputExpense = useRef();
+  const inputDate = useRef();
+  const inputDescription = useRef();
+  const inputCategory = useRef();
+  const formRef = useRef();
+
+  // useEffect(() => {
+  //   setExpenseList(cartcnxt.expenseList);
+  // }, [cartcnxt.expenseList]);
 
   const addExpenseHandler = (event) => {
     event.preventDefault();
-    console.log("edit id ", objId);
+    // console.log("edit id ", objId);
 
     let expenseObj = {
-      objId: objId,
+      objId: "",
       expenseKey: Math.random().toString(),
       expenseAmount: inputExpense.current.value,
       expenseDescription: inputDescription.current.value,
@@ -35,16 +46,46 @@ const DailyExpense = () => {
       inputDescription.current.value !== "" &&
       inputDate.current.value !== ""
     ) {
-      // console.log("inside", expenseObj);
-      cartcnxt.addExpense(expenseObj);
+      // add to context api
+      // cartcnxt.addExpense(expenseObj);
 
-      inputExpense.current.value = "";
-      inputDescription.current.value = "";
-      inputDate.current.value = "";
+      // add to cartslice
+      dispatch(expenseActions.addExpense(expenseObj));
+
+      if (objId) {
+        console.log("put objid", objId);
+        axios
+          .put(
+            `https://expense-tracker-project-64558-default-rtdb.firebaseio.com/dailyExepense/${auth.email}/${objId}.json`,
+            expenseObj
+          )
+          .then((response) => {
+            console.log("put response ", response);
+            // setObjId("");
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        axios
+          .post(
+            `https://expense-tracker-project-64558-default-rtdb.firebaseio.com/dailyExepense/${auth.email}.json`,
+            expenseObj
+          )
+          .then((response) => {
+            console.log("res", response.data);
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
+      }
+      formRef.current.reset();
     } else {
       alert("Please Enter all value");
     }
   };
+
+  // console.log("slice", expense.expenseList);
 
   const editExpenseHandler = (item) => {
     console.log("edit item", item);
@@ -54,6 +95,29 @@ const DailyExpense = () => {
     inputCategory.current.value = item.expenseCategory;
     inputDate.current.value = item.expenseDate;
     setObjId(item.id);
+    dispatch(expenseActions.editExpense(item));
+
+    // axios
+    //   .get(
+    //     `https://expense-tracker-project-64558-default-rtdb.firebaseio.com/dailyExepense/${auth.email}.json`
+    //   )
+    //   .then((response) => {
+    //     // console.log("get response", response);
+    //     const data = response.data;
+    //     console.log("get data", Object.entries(data));
+    //     Object.entries(data).forEach((i) => {
+    //       if (i[1].expenseKey === item.expenseKey) {
+    //         console.log("id", i[0]);
+    //         setObjId(i[0]);
+
+    //         // console.log("edit data", );
+    //       }
+    //     });
+    //   })
+    //   .catch((error) => {
+    //     console.log("error", error);
+    //   });
+
     // const updateList = expenseList.filter(
     //   (pdt) => pdt.expenseKey !== item.expenseKey
     // );
@@ -61,14 +125,48 @@ const DailyExpense = () => {
   };
 
   const deleteExpenseHandler = (item) => {
-    // console.log("delete item", item);
-    cartcnxt.removeExpense(item);
+    // console.log("del item", item);
+    let deleteId = item.id;
+
+    if (deleteId) {
+      axios
+        .delete(
+          `https://expense-tracker-project-64558-default-rtdb.firebaseio.com/dailyExepense/${auth.email}/${deleteId}.json`
+        )
+        .then((response) => {
+          console.log("del res", response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    // context api function
+    // cartcnxt.removeExpense(item);
+
+    // using expenseslice
+    dispatch(expenseActions.removeExpense(item));
   };
 
   let id = 0;
+  let totalExpenses = expense.expenseList.reduce(
+    (totalExp, newExp) =>
+      (totalExp = Number(totalExp) + Number(newExp.expenseAmount)),
+    0
+  );
+
+  useEffect(() => {
+    if (totalExpenses > 10000) {
+      setActivePremium(true);
+    } else {
+      setActivePremium(false);
+    }
+  }, [totalExpenses]);
+
+  console.log("New list", expense.expenseList);
+
   return (
     <div>
-      <form className="expenseform">
+      <form className="expenseform" ref={formRef}>
         <h1 className="h1-expense">Daily Expense</h1>
 
         <div className="form-row">
@@ -131,6 +229,21 @@ const DailyExpense = () => {
             Submit
           </button>
         </div>
+        <div>
+          <span className="totalExpenses">Total Expenses :</span>
+          <span className="totalExpenses"> $ {totalExpenses}</span>
+          <span className="btn-premium">
+            {activePremium && (
+              <button
+                type="button"
+                className="btn btn-outline-warning btn"
+                style={{ width: "150px", marginLeft: "260px" }}
+              >
+                Active Premium
+              </button>
+            )}
+          </span>
+        </div>
         <div className="table-responsive-sm">
           {/* {console.log("inside table", expenseList)} */}
           <table className="table" style={{ marginTop: "15px" }}>
@@ -147,7 +260,7 @@ const DailyExpense = () => {
             </thead>
             <tbody>
               {/* {console.log("expense list", expenseList)} */}
-              {expenseList.map((item) => {
+              {expense.expenseList.map((item) => {
                 return (
                   <tr className="row-exp" key={item.expenseKey}>
                     {/* <th className="row-exp" scope="row">
