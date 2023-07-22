@@ -20,7 +20,7 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.email = action.payload.email;
       state.userLoggedIn = true;
-      console.log("login111-", state.userLoggedIn);
+      // console.log("login111-", state.userLoggedIn);
       const emailobj = {
         token: action.payload.token,
         email: action.payload.email,
