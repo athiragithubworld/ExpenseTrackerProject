@@ -1,25 +1,37 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
-import AuthContext from "../../store/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
+import AuthContext from "../../store/context/AuthContext";
 import axios from "axios";
 // import classes from "./Header.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { authActions } from "../../store/AuthSlice";
+import { expenseActions } from "../../store/ExpenseSlice";
 
 const Header = (props) => {
-  const authcntx = useContext(AuthContext);
-  const isLoggedIn = authcntx.isLoggedIn;
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
+  // const authcntx = useContext(AuthContext);
+  const isLoggedIn = useSelector((state) => state.auth.userLoggedIn);
+  const token = useSelector((state) => state.auth.token);
 
   const LogoutHandler = () => {
-    authcntx.logout();
+    // authcontext form
+    // authcntx.logout();
+
+    // dispatch form
+    dispatch(authActions.logout());
+    dispatch(expenseActions.setExpenseListNull());
   };
 
   const verifyEmailHandler = () => {
-    // console.log("id", authcntx.token);
     axios
       .post(
         "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyCxXXlq-KNU4vnkfR5NMnPqgwRPh5OF-PU",
         {
           requestType: "VERIFY_EMAIL",
-          idToken: authcntx.token,
+          idToken: token,
         }
       )
       .then((response) => {
