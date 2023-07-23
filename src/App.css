@@ -1,0 +1,9 @@
+.app-file {
+  overflow: auto;
+  height: 100vh;
+  background-color: lightseagreen;
+}
+
+.dark {
+  background-color: #252424;
+}

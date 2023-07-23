@@ -8,15 +8,19 @@ import DailyExpense from "./Components/Pages/DailyExpense";
 import { useDispatch, useSelector } from "react-redux";
 import { expenseActions } from "./store/ExpenseSlice";
 import axios from "axios";
+import "./App.css";
+import { themeActions } from "./store/ThemeSlice";
 
 function App() {
   const auth = useSelector((state) => state.auth);
+  const darkMode = useSelector((state) => state.themeMode.darkMode);
+  const expense = useSelector((state) => state.themeMode);
 
   const dispatch = useDispatch();
   // console.log("slice loggin", isLoggedIn);
 
   // const authcntx = useContext(AuthContext);
-
+  let totalAmount = 0;
   const onRestore = () => {
     axios
       .get(
@@ -27,6 +31,8 @@ function App() {
         const data = response.data;
         const loadedExpense = [];
         for (const key in data) {
+          totalAmount += data[key].expenseAmount;
+
           loadedExpense.push({
             id: key,
             expenseKey: data[key].expenseKey,
@@ -53,6 +59,20 @@ function App() {
     }
   }, []);
 
+  // let totalExpense = expense.expenseList.reduce(
+  //   (totalExp, newExp) =>
+  //     (totalExp = Number(totalExp) + Number(newExp.expenseAmount)),
+  //   0
+  // );
+  console.log("App totalamount", totalAmount);
+  useEffect(() => {
+    if (totalAmount > 10000) {
+      dispatch(themeActions.loginTheme(true));
+    } else {
+      dispatch(themeActions.loginTheme(false));
+    }
+  }, [totalAmount]);
+
   const [openCart, setOpenCart] = useState(false);
 
   const clickOpenCart = () => {
@@ -75,7 +95,7 @@ function App() {
   }, [auth.userLoggedIn]);
 
   return (
-    <div>
+    <div className={`app-file ${darkMode ? "dark" : ""}`}>
       <Header onClicks={clickOpenCart}></Header>
 
       <Routes>
