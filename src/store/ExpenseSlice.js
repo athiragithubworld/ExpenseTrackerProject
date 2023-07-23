@@ -25,6 +25,14 @@ const expenseSlice = createSlice({
         (pdt) => pdt.expenseKey !== action.payload.expenseKey
       );
     },
+    totalExpenses(state) {
+      const expenseList = [...state.expenseList];
+      state.totalExpense = expenseList.reduce(
+        (totalExp, newExp) => Number(totalExp) + Number(newExp.expenseAmount),
+        0
+      );
+      // console.log("aaa", state.totalExpense);
+    },
   },
 });
 
