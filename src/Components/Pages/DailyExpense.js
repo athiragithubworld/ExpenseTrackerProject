@@ -1,23 +1,24 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import "./DailyExpense.css";
-import CartContext from "../../store/context/CartContext";
 import { useDispatch, useSelector } from "react-redux";
-// import { cartActions } from "../../store/CartSlice";
 import { expenseActions } from "../../store/ExpenseSlice";
 import axios from "axios";
+import { GrDocumentDownload } from "react-icons/gr";
+
+import Papa from "papaparse";
+import { saveAs } from "file-saver";
 
 const DailyExpense = () => {
-  // const cartcnxt = useContext(CartContext);
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
 
-  // console.log("cartcnxt.expenseList", cartcnxt.expenseList);
-  // const [expenseList, setExpenseList] = useState([cartcnxt.expenseList]);
   const [activePremium, setActivePremium] = useState(false);
+  const [downloadFlag, setdownloadFlag] = useState(false);
   const [objId, setObjId] = useState("");
 
   const expense = useSelector((state) => state.expenses);
 
+  console.log("total exp ", expense.totalExpense);
   const inputExpense = useRef();
   const inputDate = useRef();
   const inputDescription = useRef();
@@ -30,7 +31,6 @@ const DailyExpense = () => {
 
   const addExpenseHandler = (event) => {
     event.preventDefault();
-    // console.log("edit id ", objId);
 
     let expenseObj = {
       objId: "",
@@ -88,7 +88,7 @@ const DailyExpense = () => {
   // console.log("slice", expense.expenseList);
 
   const editExpenseHandler = (item) => {
-    console.log("edit item", item);
+    // console.log("edit item", item);
 
     inputExpense.current.value = item.expenseAmount;
     inputDescription.current.value = item.expenseDescription;
@@ -96,6 +96,7 @@ const DailyExpense = () => {
     inputDate.current.value = item.expenseDate;
     setObjId(item.id);
     dispatch(expenseActions.editExpense(item));
+    dispatch(expenseActions.onRestoreExpenses(item));
 
     // axios
     //   .get(
@@ -110,22 +111,15 @@ const DailyExpense = () => {
     //         console.log("id", i[0]);
     //         setObjId(i[0]);
 
-    //         // console.log("edit data", );
     //       }
     //     });
     //   })
     //   .catch((error) => {
     //     console.log("error", error);
     //   });
-
-    // const updateList = expenseList.filter(
-    //   (pdt) => pdt.expenseKey !== item.expenseKey
-    // );
-    // setExpenseList(updateList);
   };
 
   const deleteExpenseHandler = (item) => {
-    // console.log("del item", item);
     let deleteId = item.id;
 
     if (deleteId) {
@@ -148,21 +142,47 @@ const DailyExpense = () => {
   };
 
   let id = 0;
-  let totalExpenses = expense.expenseList.reduce(
+  let totalExpense = expense.expenseList.reduce(
     (totalExp, newExp) =>
       (totalExp = Number(totalExp) + Number(newExp.expenseAmount)),
     0
   );
 
   useEffect(() => {
-    if (totalExpenses > 10000) {
+    if (totalExpense > 10000) {
       setActivePremium(true);
     } else {
       setActivePremium(false);
     }
-  }, [totalExpenses]);
+  }, [totalExpense]);
 
-  console.log("New list", expense.expenseList);
+  const onActiveHandler = () => {
+    setdownloadFlag(true);
+    setActivePremium(false);
+  };
+
+  const dowloadExpenseExcelHandler = () => {
+    // Convert data to CSV format
+    const data = [];
+    expense.expenseList.forEach((val) => {
+      const ExpenseAmount = val.expenseAmount;
+      const Date = val.expenseDate;
+      const Category = val.expenseCategory;
+      const Description = val.expenseDescription;
+
+      data.push({ ExpenseAmount, Date, Category, Description });
+    });
+    console.log("data", data);
+    const csv = Papa.unparse(data);
+
+    // Convert CSV data into a Blob
+    const csvBlob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+
+    // Save the CSV file using FileSaver
+    saveAs(csvBlob, "Expensedata.csv");
+
+    setActivePremium(false);
+  };
 
   return (
     <div>
@@ -231,16 +251,37 @@ const DailyExpense = () => {
         </div>
         <div>
           <span className="totalExpenses">Total Expenses :</span>
-          <span className="totalExpenses"> $ {totalExpenses}</span>
-          <span className="btn-premium">
-            {activePremium && (
-              <button
-                type="button"
-                className="btn btn-outline-warning btn"
-                style={{ width: "150px", marginLeft: "260px" }}
-              >
-                Active Premium
-              </button>
+          <span className="totalExpenses"> $ {totalExpense}</span>
+          <span>
+            {totalExpense > 10000 ? (
+              activePremium ? (
+                <button
+                  type="button"
+                  className="btn btn-outline-warning btn"
+                  style={{ width: "150px", marginLeft: "260px" }}
+                  onClick={onActiveHandler}
+                >
+                  Active Premium
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  class="btn btn-outline-success"
+                  style={{
+                    width: "150px",
+                    // marginRight: "20px",
+                    marginLeft: "260px",
+                    color: "white",
+                  }}
+                  onClick={dowloadExpenseExcelHandler}
+                >
+                  {" "}
+                  Expense
+                  <GrDocumentDownload />
+                </button>
+              )
+            ) : (
+              ""
             )}
           </span>
         </div>
